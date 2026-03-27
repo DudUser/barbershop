@@ -25,7 +25,31 @@ Site de barbearia com:
 
 1. Entre em `C:\dev\barbershop\frontend`
 2. Instale as dependencias com `npm install`
-3. Rode `npm run dev`
+3. Copie `.env.example` para `.env`
+4. Ajuste `VITE_API_URL` se necessario
+5. Rode `npm run dev`
+
+## Deploy com Railway e Vercel
+
+### Backend no Railway
+
+1. Crie um projeto no Railway com o repo do GitHub
+2. Defina o `Root Directory` como `backend`
+3. Configure as variaveis:
+
+- `PORT=3333`
+- `FRONTEND_URL=https://SEU_FRONTEND.vercel.app`
+- `GOOGLE_CALENDAR_ID=eh0478033@gmail.com`
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL=barbearia-calendar@barbearia-calendar-491520.iam.gserviceaccount.com`
+- `GOOGLE_PRIVATE_KEY="SUA_CHAVE"`
+
+### Frontend no Vercel
+
+1. Importe o mesmo repo no Vercel
+2. Defina o `Root Directory` como `frontend`
+3. Configure a variavel:
+
+- `VITE_API_URL=https://SEU_BACKEND.up.railway.app/api`
 
 ## Google Agenda
 

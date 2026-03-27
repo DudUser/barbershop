@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API_URL = "http://localhost:3333/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3333/api";
 const MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=Rua+doutor+Fernando+Costa%2C+523+parque+hipolito";
 
