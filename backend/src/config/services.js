@@ -97,24 +97,24 @@ export const gallery = [
     id: 1,
     title: "Fade com detalhe",
     category: "Corte",
-    image: "http://localhost:5173/fotos/corte-1.jpeg",
+    image: "/fotos/corte-1.jpeg",
   },
   {
     id: 2,
     title: "Mullet moderno",
     category: "Corte",
-    image: "http://localhost:5173/fotos/corte-2.jpeg",
+    image: "/fotos/corte-2.jpeg",
   },
   {
     id: 3,
     title: "Social classico",
     category: "Corte",
-    image: "http://localhost:5173/fotos/corte-3.jpeg",
+    image: "/fotos/corte-3.jpeg",
   },
   {
     id: 4,
     title: "Degrade executivo",
     category: "Corte e barba",
-    image: "http://localhost:5173/fotos/corte-4.jpeg",
+    image: "/fotos/corte-4.jpeg",
   },
 ];
