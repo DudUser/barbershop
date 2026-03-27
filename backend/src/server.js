@@ -12,10 +12,29 @@ import {
 const app = express();
 const PORT = Number(process.env.PORT || 3333);
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const allowedOrigins = [
+  FRONTEND_URL,
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+];
 
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin(origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      const isAllowed =
+        allowedOrigins.includes(origin)
+        || origin.endsWith(".vercel.app");
+
+      if (isAllowed) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Origem nao permitida pelo CORS."));
+    },
   }),
 );
 app.use(express.json());
