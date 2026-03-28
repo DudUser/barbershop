@@ -46,7 +46,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
-    email: "",
     phone: "",
   });
 
@@ -152,7 +151,7 @@ export default function App() {
       }
 
       setStatusMessage(data.message);
-      setForm({ name: "", email: "", phone: "" });
+      setForm({ name: "", phone: "" });
       setSelectedServices([]);
       setSelectedTime("");
       await refreshAgenda();
@@ -323,7 +322,6 @@ export default function App() {
 
           <form className="booking-form" onSubmit={handleBooking}>
             <input name="name" onChange={updateForm} placeholder="Nome completo" required value={form.name} />
-            <input name="email" onChange={updateForm} placeholder="Email" required type="email" value={form.email} />
             <input name="phone" onChange={updateForm} placeholder="WhatsApp" required value={form.phone} />
 
             <div className="checkout-card">

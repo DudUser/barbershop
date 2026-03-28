@@ -51,7 +51,6 @@ const bookings = [
   {
     id: "demo-1",
     name: "Cliente da manha",
-    email: "cliente@example.com",
     phone: "(11) 99999-0000",
     date: "2026-03-20",
     start: "2026-03-20T09:00:00-03:00",
@@ -60,6 +59,10 @@ const bookings = [
     source: "demo",
   },
 ];
+
+function normalizePhone(phone = "") {
+  return phone.replace(/\D/g, "");
+}
 
 function getServiceDetails(serviceIds = []) {
   const selectedServices = services.filter((service) => serviceIds.includes(service.id));
@@ -209,9 +212,9 @@ app.get("/api/bookings", (req, res) => {
 });
 
 app.post("/api/bookings", async (req, res) => {
-  const { name, email, phone, date, time, serviceIds } = req.body;
+  const { name, phone, date, time, serviceIds } = req.body;
 
-  if (!name || !email || !phone || !date || !time || !Array.isArray(serviceIds) || !serviceIds.length) {
+  if (!name || !phone || !date || !time || !Array.isArray(serviceIds) || !serviceIds.length) {
     return res.status(400).json({ message: "Preencha todos os dados do agendamento." });
   }
 
@@ -219,6 +222,18 @@ app.post("/api/bookings", async (req, res) => {
 
   if (!selectedServices.length) {
     return res.status(400).json({ message: "Selecione pelo menos um servico valido." });
+  }
+
+  const normalizedPhone = normalizePhone(phone);
+  const hasFutureBookingForPhone = bookings.some((booking) => {
+    const samePhone = normalizePhone(booking.phone) === normalizedPhone;
+    return samePhone && dayjs(booking.end).isAfter(dayjs());
+  });
+
+  if (hasFutureBookingForPhone) {
+    return res.status(409).json({
+      message: "Ja existe um agendamento ativo para esse numero. Use outro telefone ou espere o atendimento terminar.",
+    });
   }
 
   const start = dayjs(`${date}T${time}:00-03:00`);
@@ -233,7 +248,6 @@ app.post("/api/bookings", async (req, res) => {
   const booking = {
     id: `booking-${Date.now()}`,
     name,
-    email,
     phone,
     date,
     start: start.toISOString(),
