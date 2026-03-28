@@ -66,14 +66,23 @@ function getServiceDetails(serviceIds = []) {
   const selectedIds = new Set(selectedServices.map((service) => service.id));
   const hasCorte = corteServiceIds.some((serviceId) => selectedIds.has(serviceId));
   const hasBarba = selectedIds.has("barba");
+  const hasBigode = selectedIds.has("bigode");
   const hasSobrancelha = selectedIds.has("sobrancelha");
-  const isComboCorteBarba = selectedIds.size === 2 && hasCorte && hasBarba;
-  const isComboCorteBarbaSobrancelha =
-    selectedIds.size === 3 && hasCorte && hasBarba && hasSobrancelha;
+  const onlyComplementosDeCorte = Array.from(selectedIds).every((id) =>
+    corteServiceIds.includes(id) || ["bigode", "sobrancelha"].includes(id),
+  );
+  const isComboCorteBarba = hasCorte && hasBarba && !selectedIds.has("platinado-completo");
+  const isComboCorteComComplemento =
+    hasCorte && !hasBarba && (hasBigode || hasSobrancelha) && onlyComplementosDeCorte;
 
-  const totalDuration = isComboCorteBarba || isComboCorteBarbaSobrancelha
-    ? 60
-    : selectedServices.reduce((sum, service) => sum + service.duration, 0);
+  let totalDuration = selectedServices.reduce((sum, service) => sum + service.duration, 0);
+
+  if (isComboCorteBarba) {
+    totalDuration = 60;
+  } else if (isComboCorteComComplemento) {
+    totalDuration = 45;
+  }
+
   const totalPrice = selectedServices.reduce((sum, service) => sum + service.price, 0);
 
   return {
