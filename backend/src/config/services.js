@@ -46,14 +46,14 @@ export const services = [
     name: "Bigode",
     description: "Ajuste e definicao do bigode.",
     price: 5,
-    duration: 15,
+    duration: 10,
   },
   {
     id: "sobrancelha",
     name: "Sobrancelha",
     description: "Design e limpeza da sobrancelha.",
     price: 5,
-    duration: 15,
+    duration: 5,
   },
   {
     id: "alisante",

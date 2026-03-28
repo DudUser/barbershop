@@ -74,6 +74,8 @@ function getServiceDetails(serviceIds = []) {
   const isComboCorteBarba = hasCorte && hasBarba && !selectedIds.has("platinado-completo");
   const isComboCorteComComplemento =
     hasCorte && !hasBarba && (hasBigode || hasSobrancelha) && onlyComplementosDeCorte;
+  const isComboBigodeSobrancelha =
+    !hasCorte && !hasBarba && hasBigode && hasSobrancelha && selectedIds.size === 2;
 
   let totalDuration = selectedServices.reduce((sum, service) => sum + service.duration, 0);
 
@@ -81,6 +83,8 @@ function getServiceDetails(serviceIds = []) {
     totalDuration = 60;
   } else if (isComboCorteComComplemento) {
     totalDuration = 45;
+  } else if (isComboBigodeSobrancelha) {
+    totalDuration = 15;
   }
 
   const totalPrice = selectedServices.reduce((sum, service) => sum + service.price, 0);
