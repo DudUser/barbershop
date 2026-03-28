@@ -80,7 +80,7 @@ function getServiceDetails(serviceIds = []) {
   let totalDuration = selectedServices.reduce((sum, service) => sum + service.duration, 0);
 
   if (isComboCorteBarba) {
-    totalDuration = 60;
+    totalDuration = 45;
   } else if (isComboCorteComComplemento) {
     totalDuration = 45;
   } else if (isComboBigodeSobrancelha) {
