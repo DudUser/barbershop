@@ -113,7 +113,13 @@ async function getBusyRanges(date) {
     .filter((booking) => booking.date === date)
     .map((booking) => ({ start: booking.start, end: booking.end }));
 
-  const googleBusy = await getGoogleBusySlots(date);
+  let googleBusy = [];
+
+  try {
+    googleBusy = await getGoogleBusySlots(date);
+  } catch (error) {
+    console.error("Falha ao consultar Google Calendar:", error.message);
+  }
 
   return [...localBusy, ...googleBusy].map((range) => ({
     start: dayjs(range.start),
