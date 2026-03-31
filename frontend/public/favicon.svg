@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#050505" />
+  <g fill="#e7c67a">
+    <path d="M16 20l4-8 6 6 6-10 6 10 6-6 4 8-2 2-8-4-6 6-6-9-6 9-8-6-4 4z" />
+    <text x="32" y="43" font-family="Georgia, serif" font-size="24" text-anchor="middle" font-weight="700">
+      LDR
+    </text>
+  </g>
+</svg>
