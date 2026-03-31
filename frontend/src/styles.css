@@ -30,6 +30,10 @@ input {
   font: inherit;
 }
 
+a {
+  color: inherit;
+}
+
 .page-shell {
   width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
@@ -519,6 +523,172 @@ p {
   color: var(--gold-strong);
 }
 
+.mobile-flow,
+.mobile-progress-shell,
+.mobile-progress,
+.mobile-progress-bar,
+.mobile-step-actions,
+.confirmation-card,
+.confirmation-actions,
+.mobile-topbar,
+.mobile-topbar-copy,
+.mobile-summary-card {
+  display: grid;
+}
+
+.mobile-flow {
+  gap: 18px;
+}
+
+.mobile-hero {
+  display: none;
+}
+
+.mobile-topbar {
+  display: none;
+}
+
+.mobile-progress {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mobile-progress-shell {
+  gap: 12px;
+}
+
+.mobile-progress-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(214, 174, 91, 0.08);
+  overflow: hidden;
+}
+
+.mobile-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #ebcb80, #b98842);
+  transition: width 240ms ease;
+}
+
+.mobile-progress-step {
+  border: 1px solid rgba(214, 174, 91, 0.12);
+  background: rgba(214, 174, 91, 0.04);
+  color: inherit;
+  border-radius: 18px;
+  padding: 12px 10px;
+  display: grid;
+  gap: 6px;
+  text-align: left;
+}
+
+.mobile-progress-step span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-weight: 800;
+  background: rgba(214, 174, 91, 0.08);
+}
+
+.mobile-progress-step strong {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.mobile-progress-step.active,
+.mobile-progress-step.done {
+  border-color: rgba(231, 198, 122, 0.42);
+}
+
+.mobile-progress-step.active {
+  background: rgba(214, 174, 91, 0.1);
+}
+
+.mobile-progress-step.done span,
+.mobile-progress-step.active span {
+  background: linear-gradient(135deg, #ebcb80, #b98842);
+  color: #130d06;
+}
+
+.mobile-step-panel {
+  display: grid;
+  gap: 20px;
+  animation: mobileStepIn 220ms ease;
+}
+
+.mobile-summary-card {
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: rgba(214, 174, 91, 0.07);
+  border: 1px solid rgba(214, 174, 91, 0.14);
+}
+
+.mobile-summary-card span {
+  color: var(--muted);
+}
+
+.mobile-step-actions {
+  gap: 10px;
+}
+
+.mobile-agenda-tip {
+  display: none;
+}
+
+.confirmation-card {
+  gap: 10px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(214, 174, 91, 0.05);
+  border: 1px solid rgba(214, 174, 91, 0.14);
+}
+
+.confirmation-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.confirmation-link,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  border-radius: 18px;
+  text-decoration: none;
+  padding: 14px 16px;
+  font-weight: 800;
+}
+
+.secondary-button {
+  border: 1px solid rgba(214, 174, 91, 0.18);
+  background: rgba(214, 174, 91, 0.05);
+  color: var(--gold-strong);
+}
+
+.confirmation-note {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+@keyframes mobileStepIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 980px) {
   .hero,
   .gallery-grid,
@@ -546,6 +716,55 @@ p {
     padding-top: 20px;
   }
 
+  .page-shell > .hero,
+  .page-shell > .content-grid {
+    display: none;
+  }
+
+  .mobile-hero {
+    display: grid;
+    gap: 10px;
+  }
+
+  .mobile-topbar {
+    position: sticky;
+    top: 10px;
+    z-index: 20;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(5, 5, 5, 0.92);
+    border: 1px solid rgba(214, 174, 91, 0.16);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  }
+
+  .mobile-topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .mobile-topbar-copy {
+    gap: 2px;
+    justify-items: end;
+    text-align: right;
+  }
+
+  .mobile-topbar .eyebrow {
+    margin-bottom: 0;
+    font-size: 0.68rem;
+  }
+
+  .mobile-topbar-copy strong {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
   .hero-copy,
   .hero-portfolio-panel,
   .hero-card,
@@ -554,6 +773,7 @@ p {
   }
 
   h1 {
+    max-width: none;
     font-size: 2.6rem;
   }
 
@@ -561,7 +781,69 @@ p {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .hero-service-list {
+  .hero-service-list,
+  .confirmation-actions,
+  .mobile-progress {
     grid-template-columns: 1fr;
+  }
+
+  .mobile-progress-step {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+  }
+
+  .section-heading {
+    display: grid;
+    gap: 8px;
+    align-items: start;
+  }
+
+  .section-heading h2 {
+    line-height: 0.98;
+  }
+
+  .agenda-toolbar {
+    margin-bottom: 18px;
+  }
+
+  .agenda-date-card {
+    padding: 18px;
+  }
+
+  .agenda-date-input {
+    min-height: 58px;
+    font-size: 1.25rem;
+  }
+
+  .service-card {
+    min-height: 110px;
+  }
+
+  .mobile-step-actions .submit-button,
+  .mobile-step-actions .secondary-button {
+    width: 100%;
+  }
+
+  .mobile-step-panel {
+    min-height: 60vh;
+  }
+
+  .mobile-agenda-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-agenda-tip {
+    display: grid;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(214, 174, 91, 0.04);
+    border: 1px solid rgba(214, 174, 91, 0.12);
+  }
+
+  .mobile-agenda-tip span {
+    color: var(--muted);
+    line-height: 1.5;
   }
 }
