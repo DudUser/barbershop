@@ -77,7 +77,7 @@ export async function createGoogleCalendarEvent(booking) {
       description: [
         `Cliente: ${booking.name}`,
         `Telefone: ${booking.phone}`,
-        `Servicos: ${booking.services.map((service) => service.name).join(", ")}`,
+        `Serviços: ${booking.services.map((service) => service.name).join(", ")}`,
       ].join("\n"),
       start: {
         dateTime: booking.start,

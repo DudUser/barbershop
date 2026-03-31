@@ -48,7 +48,7 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(new Error("Origem nao permitida pelo CORS."));
+      return callback(new Error("Origem não permitida pelo CORS."));
     },
   }),
 );
@@ -168,7 +168,7 @@ function serializeBooking(booking) {
 }
 
 function buildAvailabilityCacheKey(date, serviceIds) {
-  return `${date}::${serviceIds.slice().sort().join(",") || "sem-servico"}`;
+  return `${date}::${serviceIds.slice().sort().join(",") || "sem-serviço"}`;
 }
 
 function clearAvailabilityCache(date = null) {
@@ -277,7 +277,7 @@ app.post("/api/bookings", async (req, res) => {
   const { selectedServices, totalDuration, totalPrice } = getServiceDetails(serviceIds);
 
   if (!selectedServices.length) {
-    return res.status(400).json({ message: "Selecione pelo menos um servico valido." });
+    return res.status(400).json({ message: "Selecione pelo menos um serviço válido." });
   }
 
   const allBookings = await listBookings();
@@ -288,7 +288,7 @@ app.post("/api/bookings", async (req, res) => {
     const existingTime = toBusinessTime(existingBooking.start).format("HH:mm");
 
     return res.status(409).json({
-      message: `Este numero ja possui um agendamento ativo para ${existingDate} as ${existingTime}. Use outro telefone ou aguarde esse atendimento terminar.`,
+      message: `Este número já possui um agendamento ativo para ${existingDate} às ${existingTime}. Use outro telefone ou aguarde esse atendimento terminar.`,
     });
   }
 
@@ -298,7 +298,7 @@ app.post("/api/bookings", async (req, res) => {
   const conflict = busyRanges.some((busyRange) => overlaps(start, end, busyRange.start, busyRange.end));
 
   if (conflict) {
-    return res.status(409).json({ message: "Esse horario acabou de ser ocupado. Escolha outro." });
+    return res.status(409).json({ message: "Esse horário acabou de ser ocupado. Escolha outro." });
   }
 
   const booking = {
@@ -329,7 +329,7 @@ app.post("/api/bookings", async (req, res) => {
     return res.status(201).json({
       message: googleEvent?.id
         ? "Agendamento criado e enviado para o Google Agenda."
-        : "Agendamento criado em modo demonstracao. Configure o Google Agenda para sincronizar.",
+        : "Agendamento criado em modo demonstração. Configure o Google Agenda para sincronizar.",
       booking: {
         ...booking,
         services: booking.services.map((service) => service.name),
@@ -337,7 +337,7 @@ app.post("/api/bookings", async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Nao foi possivel criar o agendamento no Google Agenda.",
+      message: "Não foi possível criar o agendamento no Google Agenda.",
       details: error.message,
     });
   }

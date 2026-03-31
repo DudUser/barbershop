@@ -3,9 +3,9 @@
 Site de barbearia com:
 
 - galeria de fotos para cortes e barba
-- selecao de servicos em formato de carrinho
-- visualizacao de horarios livres e ocupados
-- agendamento com integracao preparada para Google Agenda
+- seleção de serviços em formato de carrinho
+- visualização de horários livres e ocupados
+- agendamento com integração preparada para Google Agenda
 
 ## Estrutura
 
@@ -53,17 +53,17 @@ Site de barbearia com:
 
 ## Google Agenda
 
-O backend ja funciona em modo demonstracao mesmo sem Google configurado. Nesse modo:
+O backend já funciona em modo demonstração mesmo sem Google configurado. Nesse modo:
 
-- a agenda mostra horarios ocupados salvos localmente em memoria
+- a agenda mostra horários ocupados salvos localmente em memória
 - novos agendamentos entram na lista enquanto o servidor estiver ligado
 
 Para sincronizar de verdade com o Google Agenda:
 
 1. Crie um projeto no Google Cloud
 2. Ative a Google Calendar API
-3. Gere uma conta de servico
-4. Compartilhe a agenda do barbeiro com o email dessa conta de servico
+3. Gere uma conta de serviço
+4. Compartilhe a agenda do barbeiro com o email dessa conta de serviço
 5. Preencha no `.env`:
 
 - `GOOGLE_CALENDAR_ID`
@@ -72,4 +72,4 @@ Para sincronizar de verdade com o Google Agenda:
 
 ## Observacao
 
-Hoje os agendamentos ficam salvos em `backend/data/runtime.json`. Isso ja evita perder tudo quando o processo reinicia localmente, mas em hospedagens com disco efemero ainda vale migrar para banco de dados para producao.
+Hoje os agendamentos ficam salvos em `backend/data/runtime.json`. Isso já evita perder tudo quando o processo reinicia localmente, mas em hospedagens com disco efêmero ainda vale migrar para banco de dados para produção.

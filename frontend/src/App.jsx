@@ -54,19 +54,19 @@ function buildReminderFile(booking) {
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Lideranca Barbearia//Agendamento//PT-BR",
+    "PRODID:-//Liderança Barbearia//Agendamento//PT-BR",
     "BEGIN:VEVENT",
     `UID:${booking.id}@liderancabarbearia`,
     `DTSTAMP:${formatICSDate(new Date().toISOString())}`,
     `DTSTART:${formatICSDate(booking.start)}`,
     `DTEND:${formatICSDate(booking.end)}`,
-    `SUMMARY:Lideranca Barbearia - ${booking.name || "Agendamento"}`,
-    `DESCRIPTION:Servicos: ${servicesLabel}`,
+    `SUMMARY:Liderança Barbearia - ${booking.name || "Agendamento"}`,
+    `DESCRIPTION:Serviços: ${servicesLabel}`,
     "LOCATION:Rua doutor Fernando Costa, 523 - Parque Hipolito",
     "BEGIN:VALARM",
     "TRIGGER:-PT30M",
     "ACTION:DISPLAY",
-    "DESCRIPTION:Lembrete do seu atendimento na Lideranca Barbearia",
+    "DESCRIPTION:Lembrete do seu atendimento na Liderança Barbearia",
     "END:VALARM",
     "END:VEVENT",
     "END:VCALENDAR",
@@ -183,16 +183,16 @@ export default function App() {
   };
 
   const mobileSteps = [
-    { id: "services", label: "Servicos" },
-    { id: "slots", label: "Horario" },
+    { id: "services", label: "Serviços" },
+    { id: "slots", label: "Horário" },
     { id: "client", label: "Seus dados" },
-    { id: "confirm", label: "Confirmacao" },
+    { id: "confirm", label: "Confirmação" },
   ];
 
   const reminderFileUrl = useMemo(() => buildReminderFile(confirmedBooking), [confirmedBooking]);
   const currentMobileStep = mobileSteps[mobileStep];
   const statusType = statusMessage.toLowerCase().includes("agend")
-    && !statusMessage.toLowerCase().includes("nao foi")
+    && !statusMessage.toLowerCase().includes("não foi")
     && !statusMessage.toLowerCase().includes("escolha")
     && !statusMessage.toLowerCase().includes("preencha")
     ? "success"
@@ -236,7 +236,7 @@ export default function App() {
     event.preventDefault();
 
     if (!selectedServices.length || !selectedTime) {
-      setStatusMessage("Escolha pelo menos um servico e um horario.");
+      setStatusMessage("Escolha pelo menos um serviço e um horário.");
       return;
     }
 
@@ -260,7 +260,7 @@ export default function App() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Nao foi possivel agendar.");
+        throw new Error(data.message || "Não foi possível agendar.");
       }
 
       setStatusMessage(data.message);
@@ -288,12 +288,12 @@ export default function App() {
 
   function goToNextStep() {
     if (mobileStep === 0 && !selectedServices.length) {
-      setStatusMessage("Selecione pelo menos um servico para continuar.");
+      setStatusMessage("Selecione pelo menos um serviço para continuar.");
       return;
     }
 
     if (mobileStep === 1 && !selectedTime) {
-      setStatusMessage("Escolha um horario livre para continuar.");
+      setStatusMessage("Escolha um horário livre para continuar.");
       return;
     }
 
@@ -315,11 +315,11 @@ export default function App() {
     return (
       <>
         <div className="section-heading">
-          <p className="eyebrow">Escolha seus servicos</p>
-          <h2>Monte o atendimento antes de escolher o horario.</h2>
+          <p className="eyebrow">Escolha seus serviços</p>
+          <h2>Monte o atendimento antes de escolher o horário.</h2>
         </div>
         <p className="hero-card-text">
-          Defina tudo o que sera feito durante o atendimento para descobrir o valor e o tempo total do servico.
+          Defina tudo o que será feito durante o atendimento para descobrir o valor e o tempo total do serviço.
         </p>
         <div className="hero-service-list">
           {services.map((service) => {
@@ -344,7 +344,7 @@ export default function App() {
           })}
         </div>
         <div className="hero-cart-box">
-          <strong>{cart.items.length ? `${cart.items.length} servico(s) selecionado(s)` : "Nenhum servico selecionado"}</strong>
+          <strong>{cart.items.length ? `${cart.items.length} serviço(s) selecionado(s)` : "Nenhum serviço selecionado"}</strong>
           <span>{formatDuration(appointmentDuration)} no total</span>
           <span>{formatCurrency(cart.totalPrice || 0)}</span>
         </div>
@@ -360,13 +360,13 @@ export default function App() {
       <>
         <div className="section-heading">
           <p className="eyebrow">Agenda aberta</p>
-          <h2>Escolha a data e veja os horarios livres</h2>
+          <h2>Escolha a data e veja os horários livres</h2>
         </div>
 
         <div className="agenda-toolbar">
           <div className="agenda-date-card">
             <strong>Troque a data para consultar outros dias da agenda.</strong>
-            <span>Toque no calendario e escolha o dia que voce deseja agendar.</span>
+            <span>Toque no calendário e escolha o dia que você deseja agendar.</span>
             <label>
               Data do atendimento
               <input
@@ -379,29 +379,29 @@ export default function App() {
             </label>
           </div>
           <div className="agenda-summary">
-            <span>{slots.filter((slot) => slot.available).length} horarios livres</span>
-            <span>{bookings.length} reservas visiveis</span>
+            <span>{slots.filter((slot) => slot.available).length} horários livres</span>
+            <span>{bookings.length} reservas visíveis</span>
           </div>
         </div>
 
         <div className="agenda-helper">
           <strong>Tempo previsto do atendimento: {formatDuration(appointmentDuration || 0)}</strong>
           <span>
-            Os horarios mostrados abaixo ja consideram o tempo total dos servicos escolhidos e
-            bloqueiam o proximo cliente durante esse periodo.
+            Os horários mostrados abaixo já consideram o tempo total dos serviços escolhidos e
+            bloqueiam o próximo cliente durante esse período.
           </span>
         </div>
 
         {scheduleLoading ? (
           <div className="loading-card">
             <strong>Carregando agenda</strong>
-            <span>Estamos buscando os horarios livres e as reservas do dia.</span>
+            <span>Estamos buscando os horários livres e as reservas do dia.</span>
           </div>
         ) : null}
 
         <div className={`agenda-layout ${isMobileFlow ? "mobile-agenda-layout" : ""}`}>
           <div>
-            <h3>Horarios disponiveis</h3>
+            <h3>Horários disponíveis</h3>
             <div className="slots-grid">
               {slots.map((slot) => (
                 <button
@@ -423,13 +423,13 @@ export default function App() {
 
           {!isMobileFlow ? (
             <div>
-              <h3>Horarios ja ocupados</h3>
+              <h3>Horários já ocupados</h3>
               <div className="booking-list">
                 {bookings.length ? (
                   bookings.map((booking) => (
                     <article className="booking-item" key={booking.id}>
                       <strong>{booking.time}</strong>
-                      <span>Horario indisponivel</span>
+                      <span>Horário indisponível</span>
                     </article>
                   ))
                 ) : (
@@ -442,8 +442,8 @@ export default function App() {
 
         {isMobileFlow ? (
           <div className="mobile-agenda-tip">
-            <strong>So mostramos os horarios livres no celular.</strong>
-            <span>Os horarios ocupados ja saem da lista para deixar a escolha mais rapida.</span>
+            <strong>Só mostramos os horários livres no celular.</strong>
+            <span>Os horários ocupados já saem da lista para deixar a escolha mais rápida.</span>
           </div>
         ) : null}
       </>
@@ -454,7 +454,7 @@ export default function App() {
     return (
       <>
         <div className="section-heading">
-          <p className="eyebrow">Fechar horario</p>
+          <p className="eyebrow">Fechar horário</p>
           <h2>Confirmar atendimento</h2>
         </div>
 
@@ -464,8 +464,8 @@ export default function App() {
 
           <div className="checkout-card">
             <p>Agendamento selecionado</p>
-            <strong>{selectedTime ? `${formatDisplayDate(date)} as ${selectedTime}` : "Escolha um horario na agenda"}</strong>
-            <span>{cart.items.length ? cart.items.map((item) => item.name).join(", ") : "Sem servicos"}</span>
+            <strong>{selectedTime ? `${formatDisplayDate(date)} às ${selectedTime}` : "Escolha um horário na agenda"}</strong>
+            <span>{cart.items.length ? cart.items.map((item) => item.name).join(", ") : "Sem serviços"}</span>
             <span>
               Total: {formatCurrency(cart.totalPrice || 0)} | {formatDuration(appointmentDuration)}
             </span>
@@ -479,7 +479,7 @@ export default function App() {
 
           {statusMessage ? (
             <div className={`status-message-box ${statusType}`}>
-              <strong>{statusType === "success" ? "Tudo certo" : "Nao foi possivel continuar"}</strong>
+              <strong>{statusType === "success" ? "Tudo certo" : "Não foi possível continuar"}</strong>
               <p className="status-message">{statusMessage}</p>
             </div>
           ) : null}
@@ -492,16 +492,16 @@ export default function App() {
     return (
       <>
         <div className="section-heading">
-          <p className="eyebrow">Agendamento concluido</p>
+          <p className="eyebrow">Agendamento concluído</p>
           <h2>Confirme os detalhes e salve no celular</h2>
         </div>
 
         {confirmedBooking ? (
           <div className="confirmation-card">
-            <strong>{confirmedBooking.name}, seu horario esta reservado.</strong>
+            <strong>{confirmedBooking.name}, seu horário está reservado.</strong>
             <span>Data: {formatDisplayDate(confirmedBooking.date)}</span>
-            <span>Horario: {confirmedBooking.time}</span>
-            <span>Servicos: {Array.isArray(confirmedBooking.services) ? confirmedBooking.services.join(", ") : ""}</span>
+            <span>Horário: {confirmedBooking.time}</span>
+            <span>Serviços: {Array.isArray(confirmedBooking.services) ? confirmedBooking.services.join(", ") : ""}</span>
             <span>Tempo previsto: {formatDuration(confirmedBooking.totalDuration)}</span>
             <div className="confirmation-actions">
               <a className="submit-button confirmation-link" href={MAPS_URL} rel="noreferrer" target="_blank">
@@ -518,19 +518,19 @@ export default function App() {
               ) : null}
             </div>
             <p className="confirmation-note">
-              O botao de lembrete adiciona o horario ao calendario do celular com aviso 30 minutos antes. O cliente pode aceitar ou nao.
+              O botão de lembrete adiciona o horário ao calendário do celular com aviso 30 minutos antes. O cliente pode aceitar ou não.
             </p>
           </div>
         ) : (
           <div className="confirmation-card">
-            <strong>Finalize o formulario para concluir seu agendamento.</strong>
-            <span>Depois da confirmacao, esta tela mostra data, horario e o botao de lembrete.</span>
+            <strong>Finalize o formulário para concluir seu agendamento.</strong>
+            <span>Depois da confirmação, esta tela mostra data, horário e o botão de lembrete.</span>
           </div>
         )}
 
         {statusMessage ? (
           <div className={`status-message-box ${statusType}`}>
-            <strong>{statusType === "success" ? "Tudo certo" : "Nao foi possivel continuar"}</strong>
+            <strong>{statusType === "success" ? "Tudo certo" : "Não foi possível continuar"}</strong>
             <p className="status-message">{statusMessage}</p>
           </div>
         ) : null}
@@ -545,18 +545,18 @@ export default function App() {
           <div className="hero-copy">
             <div className="inline-brand">
               <span className="inline-brand-mark">LDR</span>
-              <span className="inline-brand-text">Lideranca Barbearia</span>
+              <span className="inline-brand-text">Liderança Barbearia</span>
             </div>
-            <p className="eyebrow">Lideranca Barbearia</p>
-            <h1>Visual alinhado, agenda aberta e atendimento sem enrolacao.</h1>
+            <p className="eyebrow">Liderança Barbearia</p>
+            <h1>Visual alinhado, agenda aberta e atendimento sem enrolação.</h1>
             <p className="hero-text">
               Rua doutor Fernando Costa, 523 - Parque Hipolito
             </p>
-            <p className="hero-subtext">Terca a sabado, das 9h as 19h</p>
+            <p className="hero-subtext">Terça a sábado, das 9h às 19h</p>
             <div className="hero-location-card">
-              <strong>Atendimento com horario marcado</strong>
+              <strong>Atendimento com horário marcado</strong>
               <span>Rua doutor Fernando Costa, 523 - Parque Hipolito</span>
-              <span>Terca a sabado, das 9h as 19h</span>
+              <span>Terça a sábado, das 9h às 19h</span>
               <a className="maps-link" href={MAPS_URL} rel="noreferrer" target="_blank">
                 Como chegar
               </a>
@@ -565,7 +565,7 @@ export default function App() {
 
           <div className="hero-portfolio-panel">
             <div className="section-heading">
-              <p className="eyebrow">Portifolio</p>
+              <p className="eyebrow">Portifólio</p>
               <h2>Trabalhos em destaque</h2>
             </div>
             <div className="hero-portfolio">
@@ -583,10 +583,10 @@ export default function App() {
         </div>
 
         <aside className="hero-card">
-          <p className="hero-card-kicker">Escolha seus servicos</p>
-          <h2 className="hero-card-title">Monte o atendimento antes de escolher o horario.</h2>
+          <p className="hero-card-kicker">Escolha seus serviços</p>
+          <h2 className="hero-card-title">Monte o atendimento antes de escolher o horário.</h2>
           <p className="hero-card-text">
-            Defina tudo o que sera feito durante o atendimento para descobrir o valor e o tempo total do servico.
+            Defina tudo o que será feito durante o atendimento para descobrir o valor e o tempo total do serviço.
           </p>
           <div className="hero-service-list">
             {(initialLoading ? [] : services).map((service) => {
@@ -612,12 +612,12 @@ export default function App() {
           </div>
           {initialLoading ? (
             <div className="loading-card">
-              <strong>Carregando servicos</strong>
-              <span>Estamos preparando as opcoes de atendimento para voce.</span>
+              <strong>Carregando serviços</strong>
+              <span>Estamos preparando as opções de atendimento para você.</span>
             </div>
           ) : null}
           <div className="hero-cart-box">
-            <strong>{cart.items.length ? `${cart.items.length} servico(s) selecionado(s)` : "Nenhum servico selecionado"}</strong>
+            <strong>{cart.items.length ? `${cart.items.length} serviço(s) selecionado(s)` : "Nenhum serviço selecionado"}</strong>
             <span>{formatDuration(appointmentDuration)} no total</span>
             <span>{formatCurrency(cart.totalPrice || 0)}</span>
           </div>
@@ -651,7 +651,7 @@ export default function App() {
       <section className="mobile-topbar">
         <div className="mobile-topbar-brand">
           <span className="inline-brand-mark">LDR</span>
-          <span className="inline-brand-text">Lideranca Barbearia</span>
+          <span className="inline-brand-text">Liderança Barbearia</span>
         </div>
         <div className="mobile-topbar-copy">
           <p className="eyebrow">Etapa {mobileStep + 1}</p>
@@ -662,25 +662,25 @@ export default function App() {
       <section className="mobile-hero panel">
         <div className="inline-brand">
           <span className="inline-brand-mark">LDR</span>
-          <span className="inline-brand-text">Lideranca Barbearia</span>
+          <span className="inline-brand-text">Liderança Barbearia</span>
         </div>
         <p className="eyebrow">Rua doutor Fernando Costa, 523 - Parque Hipolito</p>
         <h1>Agende em poucos toques.</h1>
-        <p className="hero-subtext">Terca a sabado, das 9h as 19h</p>
+        <p className="hero-subtext">Terça a sábado, das 9h às 19h</p>
       </section>
 
       <MobileProgress currentStep={mobileStep} onChange={setMobileStep} steps={mobileSteps} />
 
       <section className="mobile-summary-card">
-        <strong>{selectedTime ? `${formatDisplayDate(date)} as ${selectedTime}` : "Escolha os servicos e o horario"}</strong>
-        <span>{cart.items.length ? cart.items.map((item) => item.name).join(", ") : "Nenhum servico selecionado"}</span>
+        <strong>{selectedTime ? `${formatDisplayDate(date)} às ${selectedTime}` : "Escolha os serviços e o horário"}</strong>
+        <span>{cart.items.length ? cart.items.map((item) => item.name).join(", ") : "Nenhum serviço selecionado"}</span>
         <span>{formatCurrency(cart.totalPrice || 0)} | {formatDuration(appointmentDuration)}</span>
       </section>
 
       {initialLoading ? (
         <section className="loading-card mobile-loading-card">
           <strong>Preparando seu agendamento</strong>
-          <span>Carregando servicos, fotos e agenda inicial.</span>
+          <span>Carregando serviços, fotos e agenda inicial.</span>
         </section>
       ) : null}
 

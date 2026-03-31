@@ -1,8 +1,8 @@
 export const services = [
   {
     id: "degrade-sombreado",
-    name: "Corte degrade/sombreado",
-    description: "Corte com degrade e acabamento detalhado.",
+    name: "Corte degradê/sombreado",
+    description: "Corte com degradê e acabamento detalhado.",
     price: 35,
     duration: 40,
   },
@@ -16,7 +16,7 @@ export const services = [
   {
     id: "social",
     name: "Corte social",
-    description: "Corte tradicional com acabamento classico.",
+    description: "Corte tradicional com acabamento clássico.",
     price: 30,
     duration: 40,
   },
@@ -30,7 +30,7 @@ export const services = [
   {
     id: "pezinho",
     name: "Acabamento/pezinho",
-    description: "Acerto rapido de contorno e nuca.",
+    description: "Acerto rápido de contorno e nuca.",
     price: 5,
     duration: 15,
   },
@@ -44,7 +44,7 @@ export const services = [
   {
     id: "bigode",
     name: "Bigode",
-    description: "Ajuste e definicao do bigode.",
+    description: "Ajuste e definição do bigode.",
     price: 5,
     duration: 10,
   },
@@ -71,8 +71,8 @@ export const services = [
   },
   {
     id: "pigmentacao-tinta",
-    name: "Pigmentacao/tinta",
-    description: "Aplicacao de pigmentacao ou tinta.",
+    name: "Pigmentação/tinta",
+    description: "Aplicação de pigmentação ou tinta.",
     price: 20,
     duration: 20,
   },
@@ -86,7 +86,7 @@ export const services = [
   {
     id: "platinado-completo",
     name: "Platinado + corte + sobrancelha",
-    description: "Servico completo de transformacao.",
+    description: "Serviço completo de transformação.",
     price: 160,
     duration: 180,
   },
@@ -107,7 +107,7 @@ export const gallery = [
   },
   {
     id: 3,
-    title: "Social classico",
+    title: "Social clássico",
     category: "Corte",
     image: "/fotos/corte-3.jpeg",
   },
