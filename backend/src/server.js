@@ -29,9 +29,12 @@ const businessHours = {
 };
 const BUSINESS_UTC_OFFSET = -3 * 60;
 const AVAILABILITY_CACHE_TTL_MS = 60 * 1000;
+const IP_BOOKING_COOLDOWN_HOURS = 48;
 
 const corteServiceIds = ["degrade-sombreado", "tesoura", "social", "raspado"];
 const availabilityCache = new Map();
+
+app.set("trust proxy", true);
 
 app.use(
   cors({
@@ -64,6 +67,24 @@ function normalizePhone(phone = "") {
   return digits.slice(-11);
 }
 
+function normalizeIp(ip = "") {
+  if (!ip) {
+    return "";
+  }
+
+  return ip.replace(/^::ffff:/, "").trim();
+}
+
+function getRequestIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+
+  if (typeof forwarded === "string" && forwarded.length) {
+    return normalizeIp(forwarded.split(",")[0]);
+  }
+
+  return normalizeIp(req.ip || req.socket?.remoteAddress || "");
+}
+
 function createBusinessDateTime(date, time = "00:00") {
   return dayjs.utc(`${date}T${time}:00Z`).utcOffset(BUSINESS_UTC_OFFSET, true);
 }
@@ -82,6 +103,23 @@ function findActiveBookingForPhone(bookings, phone) {
   return bookings.find((booking) => {
     const bookingPhone = booking.normalizedPhone || normalizePhone(booking.phone);
     return bookingPhone === normalizedPhone && dayjs(booking.end).isAfter(dayjs());
+  });
+}
+
+function findRecentBookingForIp(bookings, ip) {
+  const normalizedIp = normalizeIp(ip);
+
+  if (!normalizedIp) {
+    return null;
+  }
+
+  const cutoff = dayjs().subtract(IP_BOOKING_COOLDOWN_HOURS, "hour");
+
+  return bookings.find((booking) => {
+    const bookingIp = normalizeIp(booking.clientIp || "");
+    const createdAt = booking.createdAt ? dayjs(booking.createdAt) : null;
+
+    return bookingIp === normalizedIp && createdAt?.isValid() && createdAt.isAfter(cutoff);
   });
 }
 
@@ -292,6 +330,19 @@ app.post("/api/bookings", async (req, res) => {
     });
   }
 
+  const clientIp = getRequestIp(req);
+  const recentIpBooking = findRecentBookingForIp(allBookings, clientIp);
+
+  if (recentIpBooking) {
+    const nextAllowedAt = dayjs(recentIpBooking.createdAt).add(IP_BOOKING_COOLDOWN_HOURS, "hour");
+    const nextDate = toBusinessTime(nextAllowedAt).format("DD/MM/YYYY");
+    const nextTime = toBusinessTime(nextAllowedAt).format("HH:mm");
+
+    return res.status(429).json({
+      message: `Este dispositivo já fez um agendamento recentemente. Você poderá marcar outro a partir de ${nextDate} às ${nextTime}.`,
+    });
+  }
+
   const start = createBusinessDateTime(date, time);
   const end = start.add(totalDuration, "minute");
   const busyRanges = await getBusyRanges(date);
@@ -306,6 +357,7 @@ app.post("/api/bookings", async (req, res) => {
     name,
     phone,
     normalizedPhone: normalizePhone(phone),
+    clientIp,
     date,
     start: start.toISOString(),
     end: end.toISOString(),
