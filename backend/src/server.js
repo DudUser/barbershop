@@ -154,6 +154,17 @@ async function getBusyRanges(date) {
   }));
 }
 
+function serializeBooking(booking) {
+  return {
+    id: booking.id,
+    date: booking.date,
+    start: booking.start,
+    end: booking.end,
+    time: toBusinessTime(booking.start).format("HH:mm"),
+    services: booking.services.map((service) => service.name),
+  };
+}
+
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
@@ -169,6 +180,13 @@ app.get("/api/gallery", (_req, res) => {
   res.json(gallery);
 });
 
+app.get("/api/bootstrap", (_req, res) => {
+  res.json({
+    services,
+    gallery,
+  });
+});
+
 app.get("/api/availability", async (req, res) => {
   const date = req.query.date;
   const serviceIds = String(req.query.services || "")
@@ -182,6 +200,7 @@ app.get("/api/availability", async (req, res) => {
   const { totalDuration } = getServiceDetails(serviceIds);
   const appointmentDuration = totalDuration || 30;
   const slots = buildDaySlots(date);
+  const dayBookings = (await listBookings()).filter((booking) => booking.date === date);
   const busyRanges = await getBusyRanges(date);
 
   const availability = slots.map((slot) => {
@@ -203,6 +222,7 @@ app.get("/api/availability", async (req, res) => {
     date,
     appointmentDuration,
     slots: availability,
+    bookings: dayBookings.map(serializeBooking),
   });
 });
 
@@ -211,16 +231,7 @@ app.get("/api/bookings", async (req, res) => {
   const allBookings = await listBookings();
   const filteredBookings = date ? allBookings.filter((booking) => booking.date === date) : allBookings;
 
-  res.json(
-    filteredBookings.map((booking) => ({
-      id: booking.id,
-      date: booking.date,
-      start: booking.start,
-      end: booking.end,
-      time: toBusinessTime(booking.start).format("HH:mm"),
-      services: booking.services.map((service) => service.name),
-    })),
-  );
+  res.json(filteredBookings.map(serializeBooking));
 });
 
 app.post("/api/bookings", async (req, res) => {

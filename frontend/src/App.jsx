@@ -116,6 +116,8 @@ export default function App() {
   const [selectedTime, setSelectedTime] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [scheduleLoading, setScheduleLoading] = useState(true);
   const [mobileStep, setMobileStep] = useState(0);
   const [isMobileFlow, setIsMobileFlow] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState(null);
@@ -136,13 +138,17 @@ export default function App() {
 
   useEffect(() => {
     async function loadInitialData() {
-      const [servicesResponse, galleryResponse] = await Promise.all([
-        fetch(`${API_URL}/services`),
-        fetch(`${API_URL}/gallery`),
-      ]);
+      setInitialLoading(true);
 
-      setServices(await servicesResponse.json());
-      setGallery(await galleryResponse.json());
+      try {
+        const response = await fetch(`${API_URL}/bootstrap`);
+        const data = await response.json();
+
+        setServices(data.services ?? []);
+        setGallery(data.gallery ?? []);
+      } finally {
+        setInitialLoading(false);
+      }
     }
 
     loadInitialData();
@@ -150,19 +156,20 @@ export default function App() {
 
   useEffect(() => {
     async function loadSchedule() {
+      setScheduleLoading(true);
       const serviceQuery = selectedServices.join(",");
-      const [availabilityResponse, bookingsResponse] = await Promise.all([
-        fetch(`${API_URL}/availability?date=${date}&services=${serviceQuery}`),
-        fetch(`${API_URL}/bookings?date=${date}`),
-      ]);
 
-      const availabilityData = await availabilityResponse.json();
-      const bookingsData = await bookingsResponse.json();
+      try {
+        const availabilityResponse = await fetch(`${API_URL}/availability?date=${date}&services=${serviceQuery}`);
+        const availabilityData = await availabilityResponse.json();
 
-      setSlots(availabilityData.slots ?? []);
-      setAppointmentDuration(availabilityData.appointmentDuration ?? 0);
-      setBookings(bookingsData);
-      setSelectedTime("");
+        setSlots(availabilityData.slots ?? []);
+        setAppointmentDuration(availabilityData.appointmentDuration ?? 0);
+        setBookings(availabilityData.bookings ?? []);
+        setSelectedTime("");
+      } finally {
+        setScheduleLoading(false);
+      }
     }
 
     loadSchedule();
@@ -211,17 +218,18 @@ export default function App() {
   }
 
   async function refreshAgenda() {
-    const [availabilityResponse, bookingsResponse] = await Promise.all([
-      fetch(`${API_URL}/availability?date=${date}&services=${selectedServices.join(",")}`),
-      fetch(`${API_URL}/bookings?date=${date}`),
-    ]);
+    setScheduleLoading(true);
 
-    const availabilityData = await availabilityResponse.json();
-    const bookingsData = await bookingsResponse.json();
+    try {
+      const availabilityResponse = await fetch(`${API_URL}/availability?date=${date}&services=${selectedServices.join(",")}`);
+      const availabilityData = await availabilityResponse.json();
 
-    setSlots(availabilityData.slots ?? []);
-    setAppointmentDuration(availabilityData.appointmentDuration ?? 0);
-    setBookings(bookingsData);
+      setSlots(availabilityData.slots ?? []);
+      setAppointmentDuration(availabilityData.appointmentDuration ?? 0);
+      setBookings(availabilityData.bookings ?? []);
+    } finally {
+      setScheduleLoading(false);
+    }
   }
 
   async function handleBooking(event) {
@@ -383,6 +391,13 @@ export default function App() {
             bloqueiam o proximo cliente durante esse periodo.
           </span>
         </div>
+
+        {scheduleLoading ? (
+          <div className="loading-card">
+            <strong>Carregando agenda</strong>
+            <span>Estamos buscando os horarios livres e as reservas do dia.</span>
+          </div>
+        ) : null}
 
         <div className={`agenda-layout ${isMobileFlow ? "mobile-agenda-layout" : ""}`}>
           <div>
@@ -554,11 +569,15 @@ export default function App() {
               <h2>Trabalhos em destaque</h2>
             </div>
             <div className="hero-portfolio">
-              {gallery.slice(0, 4).map((item) => (
-                <article className="hero-portfolio-card" key={item.id}>
-                  <img src={item.image} alt={item.title} />
-                </article>
-              ))}
+              {initialLoading
+                ? Array.from({ length: 4 }).map((_, index) => (
+                  <article className="hero-portfolio-card loading-skeleton" key={`portfolio-skeleton-${index}`} />
+                ))
+                : gallery.slice(0, 4).map((item) => (
+                  <article className="hero-portfolio-card" key={item.id}>
+                    <img src={item.image} alt={item.title} />
+                  </article>
+                ))}
             </div>
           </div>
         </div>
@@ -570,7 +589,7 @@ export default function App() {
             Defina tudo o que sera feito durante o atendimento para descobrir o valor e o tempo total do servico.
           </p>
           <div className="hero-service-list">
-            {services.map((service) => {
+            {(initialLoading ? [] : services).map((service) => {
               const active = selectedServices.includes(service.id);
 
               return (
@@ -591,6 +610,12 @@ export default function App() {
               );
             })}
           </div>
+          {initialLoading ? (
+            <div className="loading-card">
+              <strong>Carregando servicos</strong>
+              <span>Estamos preparando as opcoes de atendimento para voce.</span>
+            </div>
+          ) : null}
           <div className="hero-cart-box">
             <strong>{cart.items.length ? `${cart.items.length} servico(s) selecionado(s)` : "Nenhum servico selecionado"}</strong>
             <span>{formatDuration(appointmentDuration)} no total</span>
@@ -651,6 +676,13 @@ export default function App() {
         <span>{cart.items.length ? cart.items.map((item) => item.name).join(", ") : "Nenhum servico selecionado"}</span>
         <span>{formatCurrency(cart.totalPrice || 0)} | {formatDuration(appointmentDuration)}</span>
       </section>
+
+      {initialLoading ? (
+        <section className="loading-card mobile-loading-card">
+          <strong>Preparando seu agendamento</strong>
+          <span>Carregando servicos, fotos e agenda inicial.</span>
+        </section>
+      ) : null}
 
       <section className="panel mobile-step-panel">
         {mobileStep === 0 ? renderServiceSelection() : null}
