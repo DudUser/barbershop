@@ -1,6 +1,7 @@
 import "dotenv/config";
 import cors from "cors";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
 import express from "express";
 import { gallery, services } from "./config/services.js";
 import {
@@ -9,6 +10,8 @@ import {
   isGoogleCalendarEnabled,
 } from "./lib/googleCalendar.js";
 import { addBooking, listBookings } from "./lib/store.js";
+
+dayjs.extend(utc);
 
 const app = express();
 const PORT = Number(process.env.PORT || 3333);
@@ -24,6 +27,7 @@ const businessHours = {
   endHour: 19,
   slotMinutes: 30,
 };
+const BUSINESS_UTC_OFFSET = -3 * 60;
 
 const corteServiceIds = ["degrade-sombreado", "tesoura", "social", "raspado"];
 
@@ -50,6 +54,14 @@ app.use(express.json());
 
 function normalizePhone(phone = "") {
   return phone.replace(/\D/g, "");
+}
+
+function createBusinessDateTime(date, time = "00:00") {
+  return dayjs.utc(`${date}T${time}:00Z`).utcOffset(BUSINESS_UTC_OFFSET, true);
+}
+
+function toBusinessTime(value) {
+  return dayjs(value).utcOffset(BUSINESS_UTC_OFFSET);
 }
 
 function getServiceDetails(serviceIds = []) {
@@ -93,16 +105,8 @@ function overlaps(slotStart, slotEnd, busyStart, busyEnd) {
 
 function buildDaySlots(date) {
   const slots = [];
-  let current = dayjs(date)
-    .hour(businessHours.startHour)
-    .minute(0)
-    .second(0)
-    .millisecond(0);
-  const end = dayjs(date)
-    .hour(businessHours.endHour)
-    .minute(0)
-    .second(0)
-    .millisecond(0);
+  let current = createBusinessDateTime(date, `${String(businessHours.startHour).padStart(2, "0")}:00`);
+  const end = createBusinessDateTime(date, `${String(businessHours.endHour).padStart(2, "0")}:00`);
 
   while (current.isBefore(end)) {
     slots.push(current);
@@ -194,7 +198,7 @@ app.get("/api/bookings", async (req, res) => {
       date: booking.date,
       start: booking.start,
       end: booking.end,
-      time: dayjs(booking.start).format("HH:mm"),
+      time: toBusinessTime(booking.start).format("HH:mm"),
       services: booking.services.map((service) => service.name),
     })),
   );
@@ -226,7 +230,7 @@ app.post("/api/bookings", async (req, res) => {
     });
   }
 
-  const start = dayjs(`${date}T${time}:00-03:00`);
+  const start = createBusinessDateTime(date, time);
   const end = start.add(totalDuration, "minute");
   const busyRanges = await getBusyRanges(date);
   const conflict = busyRanges.some((busyRange) => overlaps(start, end, busyRange.start, busyRange.end));

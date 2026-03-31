@@ -1,5 +1,14 @@
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
 import { google } from "googleapis";
+
+dayjs.extend(utc);
+
+const BUSINESS_UTC_OFFSET = -3 * 60;
+
+function createBusinessDateTime(date, hour) {
+  return dayjs.utc(`${date}T${String(hour).padStart(2, "0")}:00:00Z`).utcOffset(BUSINESS_UTC_OFFSET, true);
+}
 
 const {
   GOOGLE_CALENDAR_ID,
@@ -40,8 +49,8 @@ export async function getGoogleBusySlots(date) {
     return [];
   }
 
-  const startOfDay = dayjs(date).hour(8).minute(0).second(0).millisecond(0);
-  const endOfDay = dayjs(date).hour(20).minute(0).second(0).millisecond(0);
+  const startOfDay = createBusinessDateTime(date, 8);
+  const endOfDay = createBusinessDateTime(date, 20);
 
   const response = await client.freebusy.query({
     requestBody: {
