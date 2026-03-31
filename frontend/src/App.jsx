@@ -184,6 +184,12 @@ export default function App() {
 
   const reminderFileUrl = useMemo(() => buildReminderFile(confirmedBooking), [confirmedBooking]);
   const currentMobileStep = mobileSteps[mobileStep];
+  const statusType = statusMessage.toLowerCase().includes("agend")
+    && !statusMessage.toLowerCase().includes("nao foi")
+    && !statusMessage.toLowerCase().includes("escolha")
+    && !statusMessage.toLowerCase().includes("preencha")
+    ? "success"
+    : "error";
 
   function toggleService(serviceId) {
     setStatusMessage("");
@@ -456,7 +462,12 @@ export default function App() {
             </button>
           ) : null}
 
-          {statusMessage ? <p className="status-message">{statusMessage}</p> : null}
+          {statusMessage ? (
+            <div className={`status-message-box ${statusType}`}>
+              <strong>{statusType === "success" ? "Tudo certo" : "Nao foi possivel continuar"}</strong>
+              <p className="status-message">{statusMessage}</p>
+            </div>
+          ) : null}
         </form>
       </>
     );
@@ -502,7 +513,12 @@ export default function App() {
           </div>
         )}
 
-        {statusMessage ? <p className="status-message">{statusMessage}</p> : null}
+        {statusMessage ? (
+          <div className={`status-message-box ${statusType}`}>
+            <strong>{statusType === "success" ? "Tudo certo" : "Nao foi possivel continuar"}</strong>
+            <p className="status-message">{statusMessage}</p>
+          </div>
+        ) : null}
       </>
     );
   }

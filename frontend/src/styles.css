@@ -523,6 +523,34 @@ p {
   color: var(--gold-strong);
 }
 
+.status-message-box {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(214, 174, 91, 0.14);
+  background: rgba(214, 174, 91, 0.05);
+}
+
+.status-message-box.success {
+  border-color: rgba(166, 216, 122, 0.28);
+  background: rgba(121, 173, 88, 0.12);
+}
+
+.status-message-box.error {
+  border-color: rgba(214, 174, 91, 0.18);
+  background: rgba(91, 72, 48, 0.28);
+}
+
+.status-message-box strong {
+  font-size: 1.05rem;
+}
+
+.status-message {
+  margin: 0;
+  line-height: 1.55;
+}
+
 .mobile-flow,
 .mobile-progress-shell,
 .mobile-progress,
