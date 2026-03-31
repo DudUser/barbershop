@@ -72,4 +72,4 @@ Para sincronizar de verdade com o Google Agenda:
 
 ## Observacao
 
-Hoje os agendamentos locais ficam em memoria. Se voce quiser, no proximo passo eu posso conectar isso a um banco de dados para nao perder as reservas quando o backend reiniciar.
+Hoje os agendamentos ficam salvos em `backend/data/runtime.json`. Isso ja evita perder tudo quando o processo reinicia localmente, mas em hospedagens com disco efemero ainda vale migrar para banco de dados para producao.

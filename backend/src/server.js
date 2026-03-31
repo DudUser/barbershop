@@ -8,6 +8,7 @@ import {
   getGoogleBusySlots,
   isGoogleCalendarEnabled,
 } from "./lib/googleCalendar.js";
+import { addBooking, listBookings } from "./lib/store.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 3333);
@@ -17,6 +18,14 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
 ];
+
+const businessHours = {
+  startHour: 9,
+  endHour: 19,
+  slotMinutes: 30,
+};
+
+const corteServiceIds = ["degrade-sombreado", "tesoura", "social", "raspado"];
 
 app.use(
   cors({
@@ -38,27 +47,6 @@ app.use(
   }),
 );
 app.use(express.json());
-
-const businessHours = {
-  startHour: 9,
-  endHour: 19,
-  slotMinutes: 30,
-};
-
-const corteServiceIds = ["degrade-sombreado", "tesoura", "social", "raspado"];
-
-const bookings = [
-  {
-    id: "demo-1",
-    name: "Cliente da manha",
-    phone: "(11) 99999-0000",
-    date: "2026-03-20",
-    start: "2026-03-20T09:00:00-03:00",
-    end: "2026-03-20T10:00:00-03:00",
-    services: services.filter((service) => ["social", "barba"].includes(service.id)),
-    source: "demo",
-  },
-];
 
 function normalizePhone(phone = "") {
   return phone.replace(/\D/g, "");
@@ -125,7 +113,7 @@ function buildDaySlots(date) {
 }
 
 async function getBusyRanges(date) {
-  const localBusy = bookings
+  const localBusy = (await listBookings())
     .filter((booking) => booking.date === date)
     .map((booking) => ({ start: booking.start, end: booking.end }));
 
@@ -195,9 +183,10 @@ app.get("/api/availability", async (req, res) => {
   });
 });
 
-app.get("/api/bookings", (req, res) => {
+app.get("/api/bookings", async (req, res) => {
   const date = req.query.date;
-  const filteredBookings = date ? bookings.filter((booking) => booking.date === date) : bookings;
+  const allBookings = await listBookings();
+  const filteredBookings = date ? allBookings.filter((booking) => booking.date === date) : allBookings;
 
   res.json(
     filteredBookings.map((booking) => ({
@@ -224,8 +213,9 @@ app.post("/api/bookings", async (req, res) => {
     return res.status(400).json({ message: "Selecione pelo menos um servico valido." });
   }
 
+  const allBookings = await listBookings();
   const normalizedPhone = normalizePhone(phone);
-  const hasFutureBookingForPhone = bookings.some((booking) => {
+  const hasFutureBookingForPhone = allBookings.some((booking) => {
     const samePhone = normalizePhone(booking.phone) === normalizedPhone;
     return samePhone && dayjs(booking.end).isAfter(dayjs());
   });
@@ -256,6 +246,7 @@ app.post("/api/bookings", async (req, res) => {
     totalPrice,
     totalDuration,
     source: isGoogleCalendarEnabled() ? "google" : "local",
+    createdAt: dayjs().toISOString(),
   };
 
   try {
@@ -265,7 +256,7 @@ app.post("/api/bookings", async (req, res) => {
       booking.googleEventId = googleEvent.id;
     }
 
-    bookings.push(booking);
+    await addBooking(booking);
 
     return res.status(201).json({
       message: googleEvent?.id
