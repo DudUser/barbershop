@@ -70,14 +70,14 @@ function toBusinessTime(value) {
   return dayjs(value).utcOffset(BUSINESS_UTC_OFFSET);
 }
 
-function hasActiveBookingForPhone(bookings, phone) {
+function findActiveBookingForPhone(bookings, phone) {
   const normalizedPhone = normalizePhone(phone);
 
   if (!normalizedPhone) {
-    return false;
+    return null;
   }
 
-  return bookings.some((booking) => {
+  return bookings.find((booking) => {
     const bookingPhone = booking.normalizedPhone || normalizePhone(booking.phone);
     return bookingPhone === normalizedPhone && dayjs(booking.end).isAfter(dayjs());
   });
@@ -237,10 +237,14 @@ app.post("/api/bookings", async (req, res) => {
   }
 
   const allBookings = await listBookings();
+  const existingBooking = findActiveBookingForPhone(allBookings, phone);
 
-  if (hasActiveBookingForPhone(allBookings, phone)) {
+  if (existingBooking) {
+    const existingDate = toBusinessTime(existingBooking.start).format("DD/MM/YYYY");
+    const existingTime = toBusinessTime(existingBooking.start).format("HH:mm");
+
     return res.status(409).json({
-      message: "Ja existe um agendamento ativo para esse numero. Use outro telefone ou espere o atendimento terminar.",
+      message: `Este numero ja possui um agendamento ativo para ${existingDate} as ${existingTime}. Use outro telefone ou aguarde esse atendimento terminar.`,
     });
   }
 
