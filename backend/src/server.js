@@ -53,7 +53,13 @@ app.use(
 app.use(express.json());
 
 function normalizePhone(phone = "") {
-  return phone.replace(/\D/g, "");
+  const digits = phone.replace(/\D/g, "");
+
+  if (digits.length <= 11) {
+    return digits;
+  }
+
+  return digits.slice(-11);
 }
 
 function createBusinessDateTime(date, time = "00:00") {
@@ -62,6 +68,19 @@ function createBusinessDateTime(date, time = "00:00") {
 
 function toBusinessTime(value) {
   return dayjs(value).utcOffset(BUSINESS_UTC_OFFSET);
+}
+
+function hasActiveBookingForPhone(bookings, phone) {
+  const normalizedPhone = normalizePhone(phone);
+
+  if (!normalizedPhone) {
+    return false;
+  }
+
+  return bookings.some((booking) => {
+    const bookingPhone = booking.normalizedPhone || normalizePhone(booking.phone);
+    return bookingPhone === normalizedPhone && dayjs(booking.end).isAfter(dayjs());
+  });
 }
 
 function getServiceDetails(serviceIds = []) {
@@ -218,13 +237,8 @@ app.post("/api/bookings", async (req, res) => {
   }
 
   const allBookings = await listBookings();
-  const normalizedPhone = normalizePhone(phone);
-  const hasFutureBookingForPhone = allBookings.some((booking) => {
-    const samePhone = normalizePhone(booking.phone) === normalizedPhone;
-    return samePhone && dayjs(booking.end).isAfter(dayjs());
-  });
 
-  if (hasFutureBookingForPhone) {
+  if (hasActiveBookingForPhone(allBookings, phone)) {
     return res.status(409).json({
       message: "Ja existe um agendamento ativo para esse numero. Use outro telefone ou espere o atendimento terminar.",
     });
@@ -243,6 +257,7 @@ app.post("/api/bookings", async (req, res) => {
     id: `booking-${Date.now()}`,
     name,
     phone,
+    normalizedPhone: normalizePhone(phone),
     date,
     start: start.toISOString(),
     end: end.toISOString(),

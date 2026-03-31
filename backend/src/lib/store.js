@@ -6,6 +6,16 @@ import { services } from "../config/services.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_FILE = resolve(__dirname, "../../data/runtime.json");
 
+function normalizePhone(phone = "") {
+  const digits = phone.replace(/\D/g, "");
+
+  if (digits.length <= 11) {
+    return digits;
+  }
+
+  return digits.slice(-11);
+}
+
 function buildSeedState() {
   return {
     bookings: [
@@ -13,6 +23,7 @@ function buildSeedState() {
         id: "demo-1",
         name: "Cliente da manha",
         phone: "(11) 99999-0000",
+        normalizedPhone: "11999990000",
         date: "2026-03-20",
         start: "2026-03-20T09:00:00-03:00",
         end: "2026-03-20T10:00:00-03:00",
@@ -30,7 +41,12 @@ function sanitizeState(data = {}) {
   const seed = buildSeedState();
 
   return {
-    bookings: Array.isArray(data.bookings) ? data.bookings : seed.bookings,
+    bookings: Array.isArray(data.bookings)
+      ? data.bookings.map((booking) => ({
+        ...booking,
+        normalizedPhone: booking.normalizedPhone || normalizePhone(booking.phone),
+      }))
+      : seed.bookings,
   };
 }
 
