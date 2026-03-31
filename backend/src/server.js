@@ -28,8 +28,10 @@ const businessHours = {
   slotMinutes: 30,
 };
 const BUSINESS_UTC_OFFSET = -3 * 60;
+const AVAILABILITY_CACHE_TTL_MS = 60 * 1000;
 
 const corteServiceIds = ["degrade-sombreado", "tesoura", "social", "raspado"];
+const availabilityCache = new Map();
 
 app.use(
   cors({
@@ -165,6 +167,23 @@ function serializeBooking(booking) {
   };
 }
 
+function buildAvailabilityCacheKey(date, serviceIds) {
+  return `${date}::${serviceIds.slice().sort().join(",") || "sem-servico"}`;
+}
+
+function clearAvailabilityCache(date = null) {
+  if (!date) {
+    availabilityCache.clear();
+    return;
+  }
+
+  for (const key of availabilityCache.keys()) {
+    if (key.startsWith(`${date}::`)) {
+      availabilityCache.delete(key);
+    }
+  }
+}
+
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
@@ -197,6 +216,13 @@ app.get("/api/availability", async (req, res) => {
     return res.status(400).json({ message: "Informe a data." });
   }
 
+  const cacheKey = buildAvailabilityCacheKey(date, serviceIds);
+  const cachedResponse = availabilityCache.get(cacheKey);
+
+  if (cachedResponse && Date.now() - cachedResponse.createdAt < AVAILABILITY_CACHE_TTL_MS) {
+    return res.json(cachedResponse.data);
+  }
+
   const { totalDuration } = getServiceDetails(serviceIds);
   const appointmentDuration = totalDuration || 30;
   const slots = buildDaySlots(date);
@@ -218,12 +244,19 @@ app.get("/api/availability", async (req, res) => {
     };
   });
 
-  return res.json({
+  const responseData = {
     date,
     appointmentDuration,
     slots: availability,
     bookings: dayBookings.map(serializeBooking),
+  };
+
+  availabilityCache.set(cacheKey, {
+    createdAt: Date.now(),
+    data: responseData,
   });
+
+  return res.json(responseData);
 });
 
 app.get("/api/bookings", async (req, res) => {
@@ -291,6 +324,7 @@ app.post("/api/bookings", async (req, res) => {
     }
 
     await addBooking(booking);
+    clearAvailabilityCache(date);
 
     return res.status(201).json({
       message: googleEvent?.id
